@@ -33,10 +33,12 @@ Multica is an AI-native task management platform — like Linear, but with AI ag
 - `apps/web/` — Next.js frontend (App Router)
 - `apps/desktop/` — Electron desktop app (electron-vite)
 - `apps/mobile/` — Expo / React Native iOS app. See `apps/mobile/CLAUDE.md`.
+- `apps/docs/` — Documentation site (Fumadocs/MDX). Home of the conventions source of truth (see top of file).
 - `packages/core/` — Headless business logic (zero react-dom)
 - `packages/ui/` — Atomic UI components (zero business logic)
 - `packages/views/` — Shared business pages/components (zero next/* imports, zero react-router imports)
 - `packages/tsconfig/` — Shared TypeScript configuration
+- `packages/eslint-config/` — Shared ESLint configuration consumed by all apps/packages
 
 What lives where for sharing purposes is documented in *Sharing Principles* below — read it once.
 
@@ -98,6 +100,7 @@ make db-down          # Stop the shared PostgreSQL container
 # Frontend (all commands go through Turborepo)
 pnpm install
 pnpm dev:web          # Next.js dev server (port 3000)
+pnpm dev:docs         # Docs site dev server (apps/docs)
 pnpm dev:desktop      # Electron dev (electron-vite, HMR)
 pnpm build            # Build all frontend apps
 pnpm typecheck        # TypeScript check (all packages + apps via turbo)
@@ -151,6 +154,12 @@ make db-reset         # Drop + recreate current env's DB, then re-run migrations
 ### CI Requirements
 
 CI runs on Node 22 and Go 1.26.1 with a `pgvector/pgvector:pg17` PostgreSQL service. See `.github/workflows/ci.yml`.
+
+Other workflows in `.github/workflows/`:
+
+- `desktop-smoke.yml` — desktop app smoke tests.
+- `mobile-verify.yml` — mobile checks, path-filtered to `apps/mobile/**` and the mobile-shared `packages/core/` surface.
+- `release.yml` — CLI release: Go tests → GoReleaser multi-platform binaries → GitHub Releases + Homebrew tap, triggered by a `v*` tag (see *CLI Release* below).
 
 ### Worktree Support
 
